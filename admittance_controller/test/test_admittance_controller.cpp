@@ -289,6 +289,26 @@ TEST_F(AdmittanceControllerTest, receive_message_and_publish_updated_status)
   subscribe_and_get_messages(msg);
 }
 
+TEST_F(AdmittanceControllerTest, wrench_target)
+{
+  SetUpController();
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(controller_->get_node()->get_node_base_interface());
+
+  ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
+  ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
+
+  auto force_publisher = controller_->get_node()->create_publisher<geometry_msgs::msg::WrenchStamped>("~/wrench_reference",10);
+
+    broadcast_tfs();
+  ASSERT_EQ(
+    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_interface::return_type::OK);
+
+  
+
+}
+
 int main(int argc, char ** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
